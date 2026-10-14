@@ -182,3 +182,7 @@ GitHub: [dhokanekrushna467-web](https://github.com/dhokanekrushna467-web)
 ## 📄 License
 
 This project is intended for educational and demonstration purposes. Add a license file if you intend to distribute the project under a specific open-source license.
+
+## CI/CD Automation Test
+
+Testing automatic Jenkins pipeline trigger from GitHub.
