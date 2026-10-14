@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Libra — Smart Library</title>
+<style>
+:root {
+  --bg:#f4f7fb; --card:#fff; --text:#17233d; --muted:#8490a5;
+  --primary:#4f46e5; --border:#e8edf5; --sidebar:#171d35;
+  --green:#12a878; --orange:#f59e0b;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:var(--sidebar);color:#fff;padding:28px 18px;flex-shrink:0}
+.brand{font-size:25px;font-weight:800;letter-spacing:-1px;margin:5px 10px 42px}
+.brand span{color:#9b96ff}
+.nav-label{font-size:10px;color:#9299b5;letter-spacing:2px;margin:25px 12px 12px}
+.nav{display:flex;gap:13px;padding:13px 14px;margin:5px 0;border-radius:10px;color:#b9c1d9;font-size:14px;cursor:pointer}
+.nav.active,.nav:hover{background:#30365a;color:#fff}
+.nav.active{box-shadow:inset 3px 0 #8982ff}
+.side-note{margin-top:70px;padding:16px;background:#252c49;border-radius:12px;font-size:12px;color:#c4cbe0;line-height:1.7}
+.main{flex:1;min-width:0;padding:30px 38px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:30px}
+h1{font-size:27px;margin:0 0 7px;letter-spacing:-.7px}
+.subtitle{font-size:13px;color:var(--muted)}
+.profile{display:flex;align-items:center;gap:12px;font-size:13px;font-weight:650}
+.avatar{width:42px;height:42px;border-radius:13px;background:#e6e5ff;color:var(--primary);display:grid;place-items:center;font-weight:800}
+.badge{display:inline-flex;align-items:center;gap:7px;background:#e5f8f0;color:#07865d;padding:8px 11px;border-radius:30px;font-size:11px;font-weight:700}
+.dot{width:7px;height:7px;border-radius:50%;background:#12a878}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-bottom:24px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:21px;box-shadow:0 4px 16px #1a2b4d05}
+.stat-top{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12px;font-weight:600}
+.icon{width:40px;height:40px;border-radius:12px;background:#eeedff;display:grid;place-items:center;font-size:20px}
+.stat-number{font-size:29px;font-weight:800;letter-spacing:-1px;margin:17px 0 6px}
+.stat-caption{font-size:11px;color:var(--muted)}
+.content-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,.9fr);gap:20px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:19px}
+h2{font-size:16px;margin:0 0 5px}
+.small{font-size:12px;color:var(--muted)}
+.search{width:100%;border:1px solid var(--border);border-radius:9px;padding:12px 13px;font-size:12px;outline:none;margin-bottom:15px}
+.search:focus,input:focus,select:focus{border-color:var(--primary)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;text-align:left;white-space:nowrap}
+th{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.8px;padding:12px 9px;border-bottom:1px solid var(--border)}
+td{padding:15px 9px;font-size:12px;border-bottom:1px solid #f0f2f7}
+tbody tr:last-child td{border-bottom:0}
+.book-name{font-weight:700;margin-bottom:5px}
+.book-id{font-size:10px;color:var(--muted)}
+.pill{padding:6px 9px;border-radius:20px;font-size:10px;font-weight:700;background:#e6f8ef;color:#07865d}
+.pill.low{background:#fff2d9;color:#a56800}
+.pill.out{background:#ffe9e9;color:#c63c3c}
+.btn{border:0;background:var(--primary);color:#fff;padding:11px 15px;border-radius:9px;font-weight:650;font-size:12px;cursor:pointer}
+.btn:hover{filter:brightness(.94)}
+.btn.secondary{background:#eeedff;color:var(--primary)}
+.panel{margin-bottom:20px}
+form{display:grid;gap:12px}
+label{font-size:11px;font-weight:700;color:#526078}
+input,select{width:100%;padding:11px;border:1px solid var(--border);border-radius:9px;background:#fff;font-size:12px;margin-top:7px;outline:none}
+form .btn{width:100%;margin-top:4px}
+.message{font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.activity{display:flex;gap:11px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
+.activity:last-child{border-bottom:0}
+.activity-icon{background:#eeedff;border-radius:9px;width:34px;height:34px;display:grid;place-items:center;flex-shrink:0}
+.activity strong{font-size:12px;display:block;margin:2px 0 5px}
+.activity p{font-size:11px;color:var(--muted);margin:0;line-height:1.5}
+.footer{text-align:center;color:var(--muted);font-size:11px;padding:25px 0 5px}
+.empty{text-align:center;padding:28px;color:var(--muted);font-size:12px}
+@media(max-width:1100px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.content-grid{grid-template-columns:1fr}.main{padding:25px}}
+@media(max-width:650px){.sidebar{width:68px;padding:22px 8px}.brand{font-size:0;margin:8px 9px 35px}.brand span{font-size:24px}.nav{justify-content:center;padding:14px 5px;font-size:0}.nav-label,.side-note{display:none}.main{padding:20px 13px}.topbar{align-items:flex-start}.profile .profile-name{display:none}h1{font-size:22px}.stats{gap:10px}.card{padding:15px}.stat-number{font-size:25px}.badge{font-size:0}.badge .dot{width:9px;height:9px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="brand">libra<span>.</span></div>
+  <div class="nav-label">WORKSPACE</div>
+  <div class="nav active" onclick="showSection('dashboard')">▦ &nbsp; Dashboard</div>
+  <div class="nav" onclick="showSection('books')">▤ &nbsp; Book Collection</div>
+  <div class="nav" onclick="showSection('transactions')">⇄ &nbsp; Issue / Return</div>
+  <div class="nav-label">SYSTEM</div>
+  <div class="nav" onclick="checkHealth()">◉ &nbsp; System Status</div>
+  <div class="side-note"><strong>SMART LIBRARY</strong><br>Enterprise Library Management Platform<br><br>Powered by Flask · Docker · Kubernetes</div>
+</aside>
+<main class="main">
+  <header class="topbar">
+    <div><h1 id="page-title">Library Overview</h1><div class="subtitle" id="page-subtitle">Welcome back! Here's what's happening in your library.</div></div>
+    <div class="profile"><span class="badge"><span class="dot"></span> SYSTEM ONLINE</span><div class="avatar">SL</div><span class="profile-name">Library Admin</span></div>
+  </header>
+
+  <section id="dashboard">
+    <div class="stats">
+      <div class="card"><div class="stat-top">Total Book Titles <span class="icon">📚</span></div><div class="stat-number" id="total-books">—</div><div class="stat-caption">Unique titles in collection</div></div>
+      <div class="card"><div class="stat-top">Available Copies <span class="icon">✓</span></div><div class="stat-number" id="available-books">—</div><div class="stat-caption">Copies ready to borrow</div></div>
+      <div class="card"><div class="stat-top">Issued Copies <span class="icon">↗</span></div><div class="stat-number" id="issued-books">—</div><div class="stat-caption">Currently on loan, estimated</div></div>
+      <div class="card"><div class="stat-top">API Status <span class="icon">⚡</span></div><div class="stat-number" id="api-status" style="font-size:22px">Checking</div><div class="stat-caption" id="api-caption">Connecting to Flask backend</div></div>
+    </div>
+    <div class="content-grid">
+      <div class="card" id="books">
+        <div class="section-head"><div><h2>Book Collection</h2><div class="small">Browse books and current availability</div></div><button class="btn secondary" onclick="loadBooks()">↻ Refresh</button></div>
+        <input class="search" id="book-search" placeholder="⌕  Search by title, author or book ID..." oninput="renderBooks()">
+        <div class="table-wrap"><table><thead><tr><th>BOOK</th><th>AUTHOR</th><th>AVAILABLE</th><th>STATUS</th></tr></thead><tbody id="book-rows"><tr><td colspan="4" class="empty">Loading collection…</td></tr></tbody></table></div>
+        <div class="small" id="book-count" style="margin-top:14px"></div>
+      </div>
+      <div>
+        <div class="card panel" id="transactions">
+          <div class="section-head"><div><h2>Issue a Book</h2><div class="small">Register a new book loan</div></div><span class="icon">↗</span></div>
+          <form id="borrow-form">
+            <label>USER ID<input name="user_id" placeholder="e.g. U101" required></label>
+            <label>BOOK ID<input name="book_id" placeholder="e.g. B001" required></label>
+            <button class="btn" type="submit">Issue Book →</button>
+          </form>
+          <div id="borrow-message" class="message" aria-live="polite" style="margin-top:12px"></div>
+        </div>
+        <div class="card panel">
+          <div class="section-head"><div><h2>Return a Book</h2><div class="small">Record a returned book</div></div><span class="icon">↙</span></div>
+          <form id="return-form">
+            <label>USER ID<input name="user_id" placeholder="e.g. U101" required></label>
+            <label>BOOK ID<input name="book_id" placeholder="e.g. B001" required></label>
+            <button class="btn secondary" type="submit">Return Book</button>
+          </form>
+          <div id="return-message" class="message" aria-live="polite" style="margin-top:12px"></div>
+        </div>
+        <div class="card">
+          <div class="section-head"><div><h2>Platform Health</h2><div class="small">Backend connectivity</div></div><span class="icon">♥</span></div>
+          <div class="activity"><div class="activity-icon">⚙</div><div><strong>Flask REST API</strong><p id="health-detail">Checking service health…</p></div></div>
+          <div class="activity"><div class="activity-icon">☷</div><div><strong>Library Inventory</strong><p id="inventory-detail">Waiting for book data…</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="footer">LIBRA · Enterprise Smart Library Management Platform · v1.0.0</div>
+</main>
+</div>
+<script>
+let books = [];
+function unwrap(data) {
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === 'object') {
+    for (const key of ['books','items','data','results']) if (Array.isArray(data[key])) return data[key];
+  }
+  return [];
+}
+function getField(obj, keys, fallback='—') {
+  for (const key of keys) if (obj && obj[key] !== undefined && obj[key] !== null) return obj[key];
+  return fallback;
+}
+function renderBooks() {
+  const query = document.getElementById('book-search').value.toLowerCase();
+  const filtered = books.filter(b => JSON.stringify(b).toLowerCase().includes(query));
+  const rows = document.getElementById('book-rows');
+  if (!filtered.length) {
+    rows.innerHTML = `<tr><td colspan="4" class="empty">${books.length ? 'No books match your search.' : 'No book records returned by the API.'}</td></tr>`;
+  } else {
+    rows.innerHTML = filtered.map(b => {
+      const id = getField(b,['book_id','id','isbn']);
+      const title = getField(b,['title','name','book_name'],'Untitled book');
+      const author = getField(b,['author','author_name']);
+      const available = Number(getField(b,['available_copies','available','copies_available','quantity_available'],0)) || 0;
+      const total = Number(getField(b,['total_copies','copies','quantity','stock'],available)) || available;
+      const status = available <= 0 ? 'Unavailable' : available <= 2 ? 'Low stock' : 'Available';
+      const cls = available <= 0 ? 'out' : available <= 2 ? 'low' : '';
+      return `<tr><td><div class="book-name">${escapeHtml(title)}</div><div class="book-id">${escapeHtml(id)}</div></td><td>${escapeHtml(author)}</td><td>${available} / ${total}</td><td><span class="pill ${cls}">${status}</span></td></tr>`;
+    }).join('');
+  }
+  document.getElementById('book-count').textContent = `${filtered.length} of ${books.length} book titles`;
+  document.getElementById('total-books').textContent = books.length;
+  const available = books.reduce((sum,b) => sum + (Number(getField(b,['available_copies','available','copies_available','quantity_available'],0)) || 0),0);
+  const total = books.reduce((sum,b) => sum + (Number(getField(b,['total_copies','copies','quantity','stock'],getField(b,['available_copies','available','copies_available','quantity_available'],0))) || 0),0);
+  document.getElementById('available-books').textContent = available;
+  document.getElementById('issued-books').textContent = Math.max(0,total-available);
+  document.getElementById('inventory-detail').textContent = `${books.length} titles loaded from the library API.`;
+}
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+async function loadBooks() {
+  try {
+    const response = await fetch('/api/books');
+    if (!response.ok) throw new Error(`Books API returned HTTP ${response.status}`);
+    books = unwrap(await response.json());
+    renderBooks();
+    if (!books.length) document.getElementById('inventory-detail').textContent = 'Connected, but the API returned no book list.';
+  } catch (error) {
+    document.getElementById('book-rows').innerHTML = `<tr><td colspan="4" class="empty">Could not load books. ${escapeHtml(error.message)}</td></tr>`;
+    document.getElementById('inventory-detail').textContent = error.message;
+  }
+}
+async function checkHealth() {
+  try {
+    const response = await fetch('/api/health');
+    const data = await response.json();
+    if (!response.ok) throw new Error('Health check failed');
+    document.getElementById('api-status').textContent = 'Online';
+    document.getElementById('api-status').style.color = 'var(--green)';
+    document.getElementById('api-caption').textContent = data.version ? `Version ${data.version}` : 'API responding normally';
+    document.getElementById('health-detail').textContent = `${data.service || 'Flask API'} · ${data.status || 'UP'}`;
+  } catch (error) {
+    document.getElementById('api-status').textContent = 'Offline';
+    document.getElementById('api-status').style.color = '#c63c3c';
+    document.getElementById('api-caption').textContent = 'Check backend service';
+    document.getElementById('health-detail').textContent = error.message;
+  }
+}
+async function submitTransaction(formId, endpoint, messageId) {
+  const form = document.getElementById(formId);
+  const message = document.getElementById(messageId);
+  const button = form.querySelector('button');
+  const payload = Object.fromEntries(new FormData(form).entries());
+  button.disabled = true; button.textContent = 'Processing…'; message.textContent = '';
+  try {
+    const response = await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || data.message || `Request failed (${response.status})`);
+    message.style.color = 'var(--green)';
+    message.textContent = data.message || 'Transaction completed successfully.';
+    form.reset(); await loadBooks();
+  } catch(error) {
+    message.style.color = '#c63c3c';
+    message.textContent = error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = endpoint === '/api/borrow' ? 'Issue Book →' : 'Return Book';
+  }
+}
+document.getElementById('borrow-form').addEventListener('submit',e=>{e.preventDefault();submitTransaction('borrow-form','/api/borrow','borrow-message')});
+document.getElementById('return-form').addEventListener('submit',e=>{e.preventDefault();submitTransaction('return-form','/api/return','return-message')});
+function showSection(section) {
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const titles={dashboard:['Library Overview',"Welcome back! Here's what's happening in your library."],books:['Book Collection','Search and review your library inventory.'],transactions:['Issue & Return','Manage book loans through the library API.']};
+  const title=titles[section] || titles.dashboard;
+  document.getElementById('page-title').textContent=title[0];
+  document.getElementById('page-subtitle').textContent=title[1];
+  const target=section==='books'?document.getElementById('books'):section==='transactions'?document.getElementById('transactions'):document.getElementById('dashboard');
+  target.scrollIntoView({behavior:'smooth',block:'start'});
+}
+loadBooks(); checkHealth();
+</script>
+</body>
+</html>

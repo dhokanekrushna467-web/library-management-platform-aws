@@ -1,8 +1,12 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 
 def create_app(test_config=None):
     app = Flask(__name__)
+
+    @app.route("/")
+    def dashboard():
+        return render_template("index.html")
 
     if test_config:
         app.config.update(test_config)
