@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-library
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smart-library
+  template:
+    metadata:
+      labels:
+        app: smart-library
+    spec:
+      containers:
+        - name: library-app
+          image: krushna987/library-management-platform:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

@@ -28,3 +28,15 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Kubernetes and local binaries
+kubectl
+minikube-linux-amd64
+
+# Jenkins CI virtual environment
+.venv-ci/
+
+# Local binaries and CI environment
+kubectl
+minikube-linux-amd64
+.venv-ci/

@@ -1,6 +1,9 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = 'krushna987/library-management-platform'
+    }
 
     stages {
         stage('Checkout') {
@@ -30,18 +33,46 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t library-management-platform:latest .'
+                sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} -t ${DOCKER_IMAGE}:latest .'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_TOKEN')]) {
+                    sh '''
+                        echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker push ${DOCKER_IMAGE}:latest
+                        docker logout
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                    kubectl set image deployment/smart-library \
+                      library-app=${DOCKER_IMAGE}:${BUILD_NUMBER}
+                    kubectl rollout status deployment/smart-library --timeout=180s
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh 'kubectl get deployments,pods,services'
             }
         }
     }
 
     post {
         success {
-            echo 'CI pipeline completed successfully!'
+            echo 'CI/CD pipeline completed successfully!'
         }
-
         failure {
-            echo 'Pipeline failed. Check the stage logs.'
+            echo 'Pipeline failed. Check the failed stage logs.'
         }
     }
 }
